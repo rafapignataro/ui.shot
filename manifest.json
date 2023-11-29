@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "Quick Component",
+  "version": "1.2",
+  "description": "Quick component by click",
+  "permissions": [
+    "activeTab"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Quick Component"
+  },
+  "content_scripts": [
+    {
+      "all_frames": true,
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "lib/html2canvas.min.js",
+        "contentScript.js"
+      ],
+      "css": [
+        "styles.css"
+      ]
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  }
+}
