@@ -3,15 +3,31 @@
 
 <head>
   <title>Tab Screenshot</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="./style.css">
 </head>
 
-<body>
-  Image here:
-  <p>
-    <img id="target" src="white.png" height="480" style="border: black solid 1px" />
-  </p>
+<body class="min-h-screen">
+  <div class="container mx-auto min-h-screen flex flex-col items-center justify-center max-w-2xl gap-10">
+    <h1 class="text-3xl font-bold">
+      Quick Component
+    </h1>
+    <div class="w-full space-y-2">
+      <h2>Your screenshot</h2>
+      <div class="w-full bg-zinc-100 rounded-md overflow-hidden">
+        <img id="target" src="white.png" height="480" class="w-full h-auto bg-zinc-100" />
+      </div>
+    </div>
+    <div class="w-full space-y-2">
+      <h2>Your component</h2>
+      <div id="qc_component_html" class="w-full bg-zinc-100 rounded-md overflow-hidden">
 
+      </div>
+    </div>
+  </div>
+  <p>
+
+  </p>
+  <script src="./tailwind.min.js"></script>
   <script src="screenshot.js"></script>
 </body>
 

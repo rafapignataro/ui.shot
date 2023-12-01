@@ -1,5 +1,4 @@
 let highlightedElement = null;
-let isPopupOpen = true;
 let isSelecting = false;
 let startX, startY, endX, endY;
 
@@ -37,11 +36,10 @@ const SELECTABLE_TAGS = ['DIV', 'SECTION', 'MAIN', 'HEADER']
 
 function handleStartSelection() {
   isSelecting = true;
-
-  isSelecting = true;
-
+  console.log('START_SELECTION')
   // Adiciona uma camada semi-transparente sobre a página
   const overlay = document.createElement('div');
+  overlay.id = 'qc_overlay';
   overlay.classList.add('qc_component');
   overlay.style.position = 'fixed';
   overlay.style.top = '0';
@@ -54,60 +52,43 @@ function handleStartSelection() {
 
   // Adiciona um elemento para representar a área de recorte
   const captureArea = document.createElement('div');
+  captureArea.id = 'qc_capture_area';
   captureArea.classList.add('qc_component');
   captureArea.style.position = 'fixed';
-  captureArea.style.border = '2px dashed #fff';
+  captureArea.style.border = '2px dashed red';
   captureArea.style.zIndex = '10000';
   document.body.appendChild(captureArea);
 
   // Adiciona um botão de confirmação
   const confirmButton = document.createElement('button');
-  confirmButton.classList.add('qc_component');
   confirmButton.id = 'qc_confirm_button';
-  confirmButton.textContent = 'Confirmar';
+  confirmButton.classList.add('qc_component');
+  confirmButton.textContent = 'CONFIRM';
   confirmButton.style.position = 'fixed';
   confirmButton.style.bottom = '10px';
   confirmButton.style.left = '50%';
   confirmButton.style.transform = 'translateX(-50%)';
   confirmButton.style.zIndex = '10001';
+  confirmButton.style.background = '#fff';
+  confirmButton.style.color = '#1d1d1d';
+  confirmButton.style.padding = '4px 8px';
+  confirmButton.style.borderRadius = '4px';
   document.body.appendChild(confirmButton);
 
-  // Adiciona eventos para manipular a seleção da área de recorte
   document.addEventListener('mousedown', startCapture);
   document.addEventListener('mousemove', updateCapture);
   document.addEventListener('mouseup', endCapture);
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') {
+      cancelCapture();
+    }
+  })
 
   confirmButton.addEventListener('click', confirmCapture);
-
-  // document.addEventListener('mouseover', function (e) {
-  //   if (!isSelecting) return;
-
-  //   const closestElement = findClosestElement(e.target, SELECTABLE_TAGS);
-  //   if (closestElement) {
-  //     closestElement.classList.add('qc_highlight');
-  //     highlightedElement = closestElement;
-  //   }
-  // });
-
-  // document.addEventListener('mouseout', function () {
-  //   if (!isSelecting) return;
-
-  //   if (highlightedElement) {
-  //     highlightedElement.classList.remove('qc_highlight');
-  //     highlightedElement = null;
-  //   }
-  // });
-
-  // document.addEventListener('click', function () {
-  //   if (!isSelecting) return;
-
-  //   if (highlightedElement) {
-  //     console.log(highlightedElement)
-  //   }
-  // });
 }
 
 function startCapture(event) {
+  console.log('START_CAPTURE', isSelecting)
   if (!isSelecting) return;
 
   startX = event.clientX;
@@ -117,12 +98,13 @@ function startCapture(event) {
 
 function updateCapture(event) {
   if (!isSelecting) return;
+  console.log('update_CAPTURE', isSelecting)
 
   endX = event.clientX;
   endY = event.clientY;
 
   // Atualiza a posição e o tamanho da área de recorte
-  const captureArea = document.querySelector('div[style*="border"]');
+  const captureArea = document.getElementById('qc_capture_area');
   captureArea.style.left = Math.min(startX, endX) + 'px';
   captureArea.style.top = Math.min(startY, endY) + 'px';
   captureArea.style.width = Math.abs(endX - startX) + 'px';
@@ -130,14 +112,13 @@ function updateCapture(event) {
 }
 
 function endCapture() {
+  console.log('END_CAPTURE', isSelecting)
   if (!isSelecting) return;
 
   isSelecting = false;
 }
 
 function confirmCapture() {
-  isSelecting = false;
-
   document.querySelectorAll('.qc_component').forEach(el => el.remove());
 
   const MESSAGE = {
@@ -153,6 +134,23 @@ function confirmCapture() {
   console.log(MESSAGE)
   // 10. Send captured component to background.js
   chrome.runtime.sendMessage(MESSAGE);
+
+  resetState();
+}
+
+function cancelCapture() {
+  document.querySelectorAll('.qc_component').forEach(el => el.remove());
+
+  resetState();
+}
+
+function resetState() {
+  highlightedElement = null;
+  isSelecting = false;
+  startX = undefined;
+  startY = undefined;
+  endX = undefined;
+  endY = undefined;
 }
 
 function handleScreenshot(data) {
