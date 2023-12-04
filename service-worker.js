@@ -50,14 +50,45 @@ async function getComponentHtml(imageUrl) {
               {
                 type: 'text',
                 text: `
-                  Provide me the HTML of this screenshot. 
-                  Use only HTML and tailwind.css. 
-                  Provide me only the code. 
-                  Dont return any text besides the code. 
-                  Use components from the web to help you build this component.
-                  be as faithful as possible to the image, the component must look as similar as possible to the image, texts with the same characteristics, same colors. all details.
-                  Dont provide the full page html, only the html that represents the components in the screenshot.
-                  Don't include any explanations in your responses.
+                  Your task is to meticulously replicate the visual components, including HTML structure and TailwindCSS 
+                  styling, from the provided image. Follow the detailed instructions below for accurate and refined code generation.
+
+                  1. Input:
+                  
+                  You will receive an image depicting a specific area of a web page.
+                  The image represents a visual component that must be replicated in HTML and TailwindCSS.
+                  
+                  2. Output:
+                  
+                  Your response should include the generated HTML and TailwindCSS code only, with no additional explanations or text.
+                  
+                  3. Details to Capture:
+                  
+                  Examine and identify the HTML components used in the image.
+                  Pay close attention to styling details, such as size, borders, border-radius, colors, fonts, and any other visual attributes.
+                  Strive for the highest level of precision, ensuring an exact match with the image.
+                  
+                  4. Comparison and Refinement:
+                  
+                  After generating the initial code, compare it with the provided image.
+                  Make adjustments to enhance the accuracy and alignment of the generated code with the image.
+                  Iteratively refine the code by closely inspecting each detail until a 100% match is achieved.
+                  
+                  5. Assistance:
+                  
+                  Utilize existing HTML and TailwindCSS templates or components as references to improve the accuracy of your code.
+                  Aim for perfection in replicating both the structure and style of the visual component.
+                  
+                  6. User Interaction:
+                  
+                  You should not request additional information from the user. Generate the code solely based on the provided image.
+                  
+                  7. Training Objectives:
+                  
+                  You should be meticulous in replicating HTML structure and TailwindCSS styling from images.
+                  Achieve a high level of precision by iteratively refining the generated code based on image comparisons.
+                  
+                  8. Remember, your response should consist only of the HTML and TailwindCSS code, and the goal is to achieve a flawless replication of the visual component from the provided image. Strive for precision and accuracy throughout the code generation process.
                 `
               },
               {
