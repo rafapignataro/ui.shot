@@ -1,4 +1,78 @@
+.qc_body {
+  cursor: crosshair;
+  user-select: none;
+}
+
 .qc_highlight {
   background-clip: #bcebca !important;
   outline: 2px dashed #eb2323 !important;
+}
+
+#qc_container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  cursor: crosshair;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+#qc_capture_area {
+  position: fixed;
+  border: 3px dashed #fff;
+  background: rgba(255, 255, 255, 0.1);
+  z-index: 10000;
+}
+
+#qc_capture_area_info {
+  position: absolute;
+  bottom: -32px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  text-wrap: nowrap;
+}
+
+#qc_actions {
+  position: fixed;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.qc_button {
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 20px;
+  font-weight: bold;
+  border: 0;
+  z-index: 10002;
+  cursor: pointer;
+}
+
+.qc_button:hover {
+  filter: brightness(0.9);
+}
+
+#qc_cancel_button {
+  background: #eb2323;
+  color: #ffffff;
+}
+
+#qc_restart_button {
+  background: #3498db;
+  color: #ffffff;
+}
+
+#qc_confirm_button {
+  background: #2ecc71;
+  color: #ffffff;
 }

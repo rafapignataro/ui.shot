@@ -2,31 +2,38 @@
 <html>
 
 <head>
-  <title>Tab Screenshot</title>
+  <title>UI.SHOT</title>
   <link rel="stylesheet" href="./style.css">
 </head>
 
 <body class="min-h-screen">
-  <div class="container mx-auto min-h-screen flex flex-col items-center justify-center max-w-2xl gap-10">
-    <h1 class="text-3xl font-bold">
-      Quick Component
-    </h1>
-    <div class="w-full space-y-2">
-      <h2>Your screenshot</h2>
-      <div class="w-full bg-zinc-100 rounded-md overflow-hidden">
-        <img id="target" src="white.png" height="480" class="w-full h-auto bg-zinc-100" />
+  <header class="bg-zinc-100 w-full">
+    <div class="flex items-center h-16 px-4 max-w-4xl mx-auto">
+      <h1 class="text-xl font-bold">UI.SHOT</h1>
+    </div>
+  </header>
+  <main class="flex flex-col px-4 w-full max-w-4xl mx-auto gap-4 py-4">
+    <div class="flex flex-col w-full gap-4">
+      <h2 class="text-xl font-bold">Your screenshot</h2>
+      <div class="w-full rounded-md overflow-hidden h-[320px]">
+        <img id="target" src="white.png" height="320" class="w-auto h-full bg-zinc-100" />
       </div>
     </div>
-    <div class="w-full space-y-2">
-      <h2>Your component</h2>
-      <div id="qc_component_html" class="w-full bg-zinc-100 rounded-md overflow-hidden">
-
+    <div class="flex flex-col w-full gap-4">
+      <h2 class="text-xl font-bold">Your component</h2>
+      <div class="w-full rounded-md">
+        <div id="qc_component_html" class="w-full rounded-md overflow-hidden position-relative">
+          <div class="w-full h-64 flex items-center justify-center bg-zinc-100 border-4 border-dotted border-zinc-200 ">
+            <svg class="animate-spin duration-700 h-10 w-10 text-zinc-800" xmlns="http://www.w3.org/2000/svg"
+              fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+            </svg>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-  <p>
-
-  </p>
+  </main>
   <script src="./tailwind.min.js"></script>
   <script src="screenshot.js"></script>
 </body>

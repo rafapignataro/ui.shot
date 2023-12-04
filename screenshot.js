@@ -12,8 +12,12 @@ chrome.runtime.onMessage.addListener(function (request) {
     console.log(request.data)
 
     const html = request.data.choices[0].message.content;
+    console.log('RAW HTML', html);
+    const processedHtml = html.replace(/^```html|```$/g, '')
+    console.log('PROCESSED HTML', processedHtml);
 
-    document.getElementById('qc_component_html').innerHTML = html.substring(8, html.length - 3)
+    document.getElementById('qc_component_html').innerHTML = processedHtml;
+
     return;
   }
 });

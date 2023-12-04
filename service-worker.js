@@ -1,11 +1,8 @@
 chrome.action.onClicked.addListener(async function (tab) {
-  console.log(tab)
-
-  chrome.tabs.sendMessage(tab.id, { event: 'START_SELECTION' });
+  chrome.tabs.sendMessage(tab.id, { event: 'OPEN_APP' });
 });
 
 chrome.runtime.onMessage.addListener(async function (request, sender, sendResponse) {
-  console.log(request)
   if (request.event === 'COMPONENT_SELECTED') {
     const screenshotUrl = await chrome.tabs.captureVisibleTab();
 
@@ -37,6 +34,7 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
 async function getComponentHtml(imageUrl) {
   try {
     console.log('GETTING COMPONENT')
+
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -52,13 +50,15 @@ async function getComponentHtml(imageUrl) {
               {
                 type: 'text',
                 text: `
-                Provide me the HTML of this screenshot. 
-                Use only HTML and tailwind.css. 
-                Provide me only the code. 
-                Dont return any text besides the code. 
-                Use components from the web to help you build this component.
-                Dont provide the full page html, only the html that represents the components in the screenshot.
-              `
+                  Provide me the HTML of this screenshot. 
+                  Use only HTML and tailwind.css. 
+                  Provide me only the code. 
+                  Dont return any text besides the code. 
+                  Use components from the web to help you build this component.
+                  be as faithful as possible to the image, the component must look as similar as possible to the image, texts with the same characteristics, same colors. all details.
+                  Dont provide the full page html, only the html that represents the components in the screenshot.
+                  Don't include any explanations in your responses.
+                `
               },
               {
                 type: 'image_url',
