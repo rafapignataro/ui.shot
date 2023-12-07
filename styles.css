@@ -16,14 +16,15 @@
   height: 100%;
   z-index: 9999;
   cursor: crosshair;
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.3);
 }
 
 #qc_capture_area {
   position: fixed;
-  border: 3px dashed #fff;
-  background: rgba(255, 255, 255, 0.1);
   z-index: 10000;
+  border: 2px dashed #fff;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 6px;
 }
 
 #qc_capture_area_info {
@@ -39,40 +40,83 @@
 
 #qc_actions {
   position: fixed;
-  bottom: 10px;
+  bottom: 12px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 10001;
+  background: #1d1d1d;
+  padding: 8px;
   display: flex;
-  align-items: center;
+  align-items: stretch;
   gap: 8px;
+  border-radius: 6px;
+  border: 1px solid #3d3d3d;
 }
 
 .qc_button {
-  padding: 8px 16px;
+  padding: 6px;
   border-radius: 4px;
-  font-size: 20px;
+  font-size: 16px;
   font-weight: bold;
   border: 0;
   z-index: 10002;
   cursor: pointer;
+  transition: all .25s;
+  background: 0;
+  color: #fff;
 }
 
 .qc_button:hover {
-  filter: brightness(0.9);
+  filter: brightness(0.7);
 }
 
-#qc_cancel_button {
+/* #qc_cancel_button {
   background: #eb2323;
   color: #ffffff;
-}
+  padding: 6px;
+} */
 
-#qc_restart_button {
+/* #qc_restart_button {
   background: #3498db;
   color: #ffffff;
-}
+} */
 
-#qc_confirm_button {
+/* #qc_confirm_button {
   background: #2ecc71;
   color: #ffffff;
+} */
+
+.qc_divider {
+  height: inherit;
+  width: 1px;
+  background: #3d3d3d;
+}
+
+#qc_notifications {
+  position: fixed;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.qc_notification_item {
+  z-index: 10001;
+  background: #1d1d1d;
+  padding: 8px;
+  gap: 4px;
+  border-radius: 6px;
+  border: 1px solid #3d3d3d;
+  display: flex;
+  align-items: flex-start;
+  font-size: 14px;
+  color: #fff;
+}
+
+.qc_notification_item button {
+  padding: 4px;
 }

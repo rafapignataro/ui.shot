@@ -8,11 +8,15 @@ const RESET_STATE = {
     startX: 0,
     startY: 0,
     endX: 0,
-    endY: 0
+    endY: 0,
+    width: 0,
+    height: 0,
+    deviceWidth: 0,
+    devieHeight: 0
   }
 };
 const devicePixelRatio = window.devicePixelRatio || 1;
-console.log('devicePixelRatio', devicePixelRatio)
+
 let APP_STATE = { ...RESET_STATE };
 
 chrome.runtime.onMessage.addListener((request) => {
@@ -71,10 +75,46 @@ function renderUI() {
       <div id="qc_capture_area">
         <span id="qc_capture_area_info"></span>
       </div>
+      <div id="qc_notifications" class="id="qc_notifications"">
+        <div class="qc_notification_item">
+          <span>
+            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quo, ipsam quod. Eos aspernatur, nisi a cum quia nihil recusandae minima quisquam totam quas nostrum quos quibusdam soluta debitis praesentium ab!
+          </span>
+          <button class="qc_button" title="Close notification">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20" stroke-width="1.5" stroke="currentColor" width="20" height="20">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <div class="qc_notification_item">
+          <span>
+            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quo, ipsam quod.
+          </span>
+          <button class="qc_button" title="Close notification">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20" stroke-width="1.5" stroke="currentColor" width="20" height="20">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
       <div id="qc_actions">
-        <button id="qc_cancel_button" class="qc_button">CANCEL</button>
-        <button id="qc_restart_button" class="qc_button">RESTART</button>
-        <button id="qc_confirm_button" class="qc_button">CONFIRM</button>
+        <button id="qc_cancel_button" class="qc_button" title="Cancel">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"  width="24" height="24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+        <div class="qc_divider"></div>
+        <button id="qc_restart_button" class="qc_button" title="Reset selection">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"  width="24" height="24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 00-3.7-3.7 48.678 48.678 0 00-7.324 0 4.006 4.006 0 00-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3l-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 003.7 3.7 48.656 48.656 0 007.324 0 4.006 4.006 0 003.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3l-3 3" />
+          </svg>
+        </button>
+        <div class="qc_divider"></div>
+        <button id="qc_confirm_button" class="qc_button" title="Confirm">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"  width="24" height="24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+          </svg>
+        </button>
       </div>
     </div>
   `;
@@ -102,6 +142,8 @@ function updateCapture(event) {
   const startY = APP_STATE.selection.startY;
   const endX = event.clientX;
   const endY = event.clientY;
+  const width = 0;
+  const height = 0;
 
   APP_STATE.selection.endX = endX;
   APP_STATE.selection.endY = endY;
