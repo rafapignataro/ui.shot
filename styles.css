@@ -4,8 +4,10 @@
 }
 
 .qc_highlight {
-  background-clip: #bcebca !important;
-  outline: 2px dashed #eb2323 !important;
+  background-clip: #3700fe !important;
+  box-shadow: inset 0 0 10px rgba(227, 92, 77, 0.4) !important;
+  box-sizing: border-box;
+  border: 2px dashed #e74c3c !important
 }
 
 #qc_container {
@@ -119,4 +121,58 @@
 
 .qc_notification_item button {
   padding: 4px;
+}
+
+/* -------------- */
+
+.ui_shot_highlight {
+  box-shadow: inset 0 0 10px #e74c3c !important;
+  box-sizing: border-box;
+  border: 2px dashed #c0392b !important
+}
+
+.ui_shot_highlight_selected {
+  box-shadow: inset 0 0 10px #9b59b6 !important;
+  box-sizing: border-box;
+  border: 2px dashed #8e44ad !important
+}
+
+#ui_shot_menu {
+  position: fixed;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  background: #1d1d1d;
+  border-radius: 4px;
+  gap: 4px;
+  border: 1px solid #3d3d3d;
+  z-index: 9999999;
+}
+
+.ui_shot_button {
+  padding: 6px;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: bold;
+  border: 0;
+  z-index: 10002;
+  cursor: pointer;
+  transition: all .25s;
+  background: 0;
+  color: #fff !important;
+}
+
+.ui_shot_button svg {
+  width: 20px;
+  height: 20px;
+}
+
+#ui_shot_cancel_button {
+  color: #e74c3c;
+}
+
+#ui_shot_confirm_button {
+  color: #2ecc71;
 }

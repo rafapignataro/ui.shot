@@ -1,27 +1,10 @@
 // CONSTANTS
-const SELECTABLE_TAGS = ['DIV', 'SECTION', 'MAIN', 'HEADER'];
-const RESET_STATE = {
-  isOpen: false,
-  isSelecting: false,
-  isSelected: false,
-  selection: {
-    startX: 0,
-    startY: 0,
-    endX: 0,
-    endY: 0,
-    width: 0,
-    height: 0,
-    deviceWidth: 0,
-    devieHeight: 0
-  }
-};
-const devicePixelRatio = window.devicePixelRatio || 1;
-
-let APP_STATE = { ...RESET_STATE };
+const SELECTABLE_TAGS = ['DIV', 'SECTION', 'MAIN', 'HEADER', 'NAV', 'FOOTER'];
+const DEVICE_PIXEL_RATIO = window.devicePixelRatio || 1;
 
 chrome.runtime.onMessage.addListener((request) => {
   if (request.event === 'OPEN_APP') {
-    startApp();
+    init();
     return;
   }
 
@@ -31,199 +14,146 @@ chrome.runtime.onMessage.addListener((request) => {
   }
 });
 
-function startApp() {
-  const app = document.createElement('div');
-  app.id = 'qc_app';
+let hoverElement = null;
+let selectedElement = null;
+let selectedElementCoords = null;
 
-  app.innerHTML = renderUI();
+function init() {
+  const menu = document.createElement('div');
+  menu.id = 'ui_shot_menu';
 
-  document.body.appendChild(app);
+  const cancelButton = document.createElement('button');
+  cancelButton.id = 'ui_shot_cancel_button';
+  cancelButton.className = 'ui_shot_button';
+  cancelButton.innerHTML = `
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+    </svg>
+  `
 
-  APP_STATE.isOpen = true;
+  const confirmButton = document.createElement('button');
+  confirmButton.id = 'ui_shot_confirm_button';
+  confirmButton.className = 'ui_shot_button';
+  confirmButton.innerHTML = `
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+    </svg>
+  `
 
-  document.addEventListener('mousedown', startCapture);
-  document.addEventListener('mousemove', updateCapture);
-  document.addEventListener('mouseup', endCapture);
-  document.addEventListener('keydown', cancelCapture);
+  confirmButton.addEventListener('click', async () => {
+    if (!selectedElement || !selectedElementCoords) return;
 
-  document.getElementById('qc_cancel_button').addEventListener('click', e => cancelCapture({ key: 'Escape' }));
-  document.getElementById('qc_restart_button').addEventListener('click', restartCapture);
-  document.getElementById('qc_confirm_button').addEventListener('click', confirmCapture);
+    chrome.runtime.sendMessage({ event: 'COMPONENT_SELECTED' });
+  })
 
-  console.log('START APP', APP_STATE)
+  menu.appendChild(cancelButton);
+  menu.appendChild(confirmButton);
+
+  document.body.appendChild(menu);
+
+  document.body.style.cursor = 'pointer';
+
+  cancelButton.addEventListener('click', () => {
+    document.removeEventListener('mouseover', handleMouseOver);
+    document.removeEventListener('mouseout', handleMouseOut);
+    document.addEventListener('click', handleMouseClick);
+
+    document.body.removeChild(menu);
+    hoverElement = null;
+  });
+
+  document.addEventListener('mouseover', handleMouseOver);
+  document.addEventListener('mouseout', handleMouseOut);
+  document.addEventListener('click', handleMouseClick);
 }
 
-function closeApp() {
-  document.removeEventListener('mousedown', startCapture);
-  document.removeEventListener('mousemove', updateCapture);
-  document.removeEventListener('mouseup', endCapture);
-  document.removeEventListener('keydown', cancelCapture);
+function handleMouseOver(event) {
+  const { target } = event;
 
-  document.getElementById('qc_cancel_button').removeEventListener('click', e => cancelCapture({ key: 'Escape' }));
-  document.getElementById('qc_restart_button').removeEventListener('click', restartCapture);
-  document.getElementById('qc_confirm_button').removeEventListener('click', confirmCapture);
+  if (!target) return;
 
-  const app = document.getElementById('qc_app');
+  const menu = document.getElementById('ui_shot_menu');
 
-  document.body.removeChild(app);
-  APP_STATE = { ...RESET_STATE };
+  if (!menu) return;
+
+  if (target === menu || menu.contains(target)) return;
+
+  const element = findClosestElement(target, SELECTABLE_TAGS);
+
+  if (!element) return;
+
+  if (hoverElement) hoverElement.classList.remove('ui_shot_highlight');
+
+  element.classList.add('ui_shot_highlight');
+
+  hoverElement = element;
 }
 
-function renderUI() {
-  return `
-    <div id="qc_container">
-      <div id="qc_capture_area">
-        <span id="qc_capture_area_info"></span>
-      </div>
-      <div id="qc_notifications" class="id="qc_notifications"">
-        <div class="qc_notification_item">
-          <span>
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quo, ipsam quod. Eos aspernatur, nisi a cum quia nihil recusandae minima quisquam totam quas nostrum quos quibusdam soluta debitis praesentium ab!
-          </span>
-          <button class="qc_button" title="Close notification">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20" stroke-width="1.5" stroke="currentColor" width="20" height="20">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-        <div class="qc_notification_item">
-          <span>
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quo, ipsam quod.
-          </span>
-          <button class="qc_button" title="Close notification">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20" stroke-width="1.5" stroke="currentColor" width="20" height="20">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-      </div>
-      <div id="qc_actions">
-        <button id="qc_cancel_button" class="qc_button" title="Cancel">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"  width="24" height="24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-        <div class="qc_divider"></div>
-        <button id="qc_restart_button" class="qc_button" title="Reset selection">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"  width="24" height="24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 00-3.7-3.7 48.678 48.678 0 00-7.324 0 4.006 4.006 0 00-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3l-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 003.7 3.7 48.656 48.656 0 007.324 0 4.006 4.006 0 003.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3l-3 3" />
-          </svg>
-        </button>
-        <div class="qc_divider"></div>
-        <button id="qc_confirm_button" class="qc_button" title="Confirm">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"  width="24" height="24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-          </svg>
-        </button>
-      </div>
-    </div>
-  `;
+function handleMouseOut(event) {
+  const { target } = event;
+
+  if (!target) return;
+
+  target.classList.remove('ui_shot_highlight');
 }
 
-function startCapture(event) {
-  if (!APP_STATE.isOpen || APP_STATE.isSelected) return;
+function handleMouseClick(event) {
+  const { target } = event;
 
-  console.log('START_CAPTURE')
+  if (!target) return;
 
-  APP_STATE.isSelecting = true;
+  if (!hoverElement) return;
 
-  APP_STATE.selection.startX = event.clientX;
-  APP_STATE.selection.startY = event.clientY;
+  const menu = document.getElementById('ui_shot_menu');
 
-  updateCapture(event);
-}
+  if (!menu) return;
 
-function updateCapture(event) {
-  if (!APP_STATE.isOpen || !APP_STATE.isSelecting) return;
+  if (target === menu || menu.contains(target)) return;
 
-  console.log('UPDATING_CAPTURE', APP_STATE.selection)
+  if (selectedElement) selectedElement.classList.remove('ui_shot_highlight_selected');
 
-  const startX = APP_STATE.selection.startX;
-  const startY = APP_STATE.selection.startY;
-  const endX = event.clientX;
-  const endY = event.clientY;
-  const width = 0;
-  const height = 0;
+  selectedElement = hoverElement;
 
-  APP_STATE.selection.endX = endX;
-  APP_STATE.selection.endY = endY;
+  selectedElement.classList.add('ui_shot_highlight_selected');
 
-  const captureArea = document.getElementById('qc_capture_area');
-  captureArea.style.left = Math.min(startX, endX) + 'px';
-  captureArea.style.top = Math.min(startY, endY) + 'px';
-  captureArea.style.width = Math.abs(endX - startX) + 'px';
-  captureArea.style.height = Math.abs(endY - startY) + 'px';
+  const eltCoords = selectedElement.getBoundingClientRect();
 
-  const captureAreaInfo = document.getElementById('qc_capture_area_info');
-  captureAreaInfo.innerText = `${Math.abs(endX - startX)} x ${Math.abs(endY - startY)}`;
-}
+  console.log('eltCoords', eltCoords)
 
-function endCapture() {
-  if (!APP_STATE.isOpen || !APP_STATE.isSelecting) return;
-
-  console.log('FINISHED_CAPTURE');
-
-  APP_STATE.isSelecting = false;
-  APP_STATE.isSelected = true;
-}
-
-async function confirmCapture() {
-  if (!APP_STATE.isOpen || APP_STATE.isSelecting || !APP_STATE.isSelected) return;
-
-  console.log('CONFIRMED_CAPTURE', APP_STATE.selection);
-
-  const MESSAGE = {
-    event: 'COMPONENT_SELECTED',
-    data: APP_STATE.selection
+  selectedElementCoords = {
+    x: eltCoords.left,
+    y: eltCoords.top,
+    width: eltCoords.width,
+    height: eltCoords.height
   }
 
-  closeApp();
-
-  await new Promise(resolve => setTimeout(resolve, 1000))
-
-  chrome.runtime.sendMessage(MESSAGE);
+  console.log('selectedElementCoords', selectedElementCoords)
 }
 
-function restartCapture() {
-  if (!APP_STATE.isOpen) return;
+function cropScreenshot({ screenshotUrl }) {
+  console.log({
+    selectedElement,
+    selectedElementCoords
+  })
+  if (!selectedElement || !selectedElementCoords) return;
 
-  APP_STATE.isSelecting = false;
-  APP_STATE.isSelected = false;
-  APP_STATE.selection = RESET_STATE.selection;
-
-  const captureArea = document.getElementById('qc_capture_area');
-  captureArea.style.left = '';
-  captureArea.style.top = '';
-  captureArea.style.width = '';
-  captureArea.style.height = '';
-
-  const captureAreaInfo = document.getElementById('qc_capture_area_info');
-  captureAreaInfo.innerText = '';
-
-  console.log('RESTART_CAPTURE');
-}
-
-function cancelCapture(event) {
-  if (event.key === 'Escape') closeApp();
-}
-
-function cropScreenshot(data) {
-  console.log('data', data)
+  const { x, y, width, height } = selectedElementCoords;
+  console.log('crop area', selectedElementCoords)
 
   const img = new Image();
-  img.src = data.screenshotUrl;
+  img.src = screenshotUrl;
 
   img.onload = function () {
     const canvas = document.createElement('canvas');
-    canvas.width = Math.abs(data.endX - data.startX) * devicePixelRatio;
-    canvas.height = Math.abs(data.endY - data.startY) * devicePixelRatio;
+    canvas.width = width * DEVICE_PIXEL_RATIO;
+    canvas.height = height * DEVICE_PIXEL_RATIO;
 
     const ctx = canvas.getContext('2d');
 
     ctx.drawImage(
       img,
-      Math.min(data.startX, data.endX) * devicePixelRatio,
-      Math.min(data.startY, data.endY) * devicePixelRatio,
+      x * DEVICE_PIXEL_RATIO,
+      y * DEVICE_PIXEL_RATIO,
       canvas.width,
       canvas.height,
       0,
@@ -234,7 +164,7 @@ function cropScreenshot(data) {
 
     const croppedImage = canvas.toDataURL('image/png');
 
-    chrome.runtime.sendMessage({ event: 'COMPONENT_SCREENSHOT', data: { url: croppedImage } });
+    chrome.runtime.sendMessage({ event: 'COMPONENT_SCREENSHOT', data: { image: croppedImage, html: selectedElement.innerHTML } });
   };
 }
 
@@ -249,7 +179,7 @@ function findClosestElement(element, tags) {
   return null;
 }
 
-function downloadCanvasImage(url) {
+function downloadImage(url) {
   const downloadLink = document.createElement('a');
   downloadLink.href = url;
   downloadLink.download = `qc_${new Date().getTime(0)}`;
