@@ -1,15 +1,15 @@
 chrome.action.onClicked.addListener(async function (tab) {
-  chrome.tabs.sendMessage(tab.id, { event: 'OPEN_APP' });
+  chrome.tabs.sendMessage(tab.id, { event: 'START_APP' });
 });
 
 chrome.runtime.onMessage.addListener(async function (request, sender, sendResponse) {
-  if (request.event === 'COMPONENT_SELECTED') {
+  if (request.event === 'REQUEST_SCREENSHOT') {
     const screenshotUrl = await chrome.tabs.captureVisibleTab();
 
-    chrome.tabs.sendMessage(sender.tab.id, { event: 'SCREENSHOT', data: { screenshotUrl } });
+    chrome.tabs.sendMessage(sender.tab.id, { event: 'TAB_SCREENSHOT', data: { screenshotUrl } });
   }
 
-  if (request.event === 'COMPONENT_SCREENSHOT') {
+  if (request.event === 'CROP_IMAGE') {
     console.log(request)
     const viewTabUrl = chrome.runtime.getURL('screenshot.html');
 
@@ -21,12 +21,12 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
       chrome.tabs.onUpdated.removeListener(listener);
 
       console.log(1)
-      chrome.tabs.sendMessage(tabId, { event: 'RENDER_SCREENSHOT', data: { image: request.data.image } });
+      chrome.tabs.sendMessage(tabId, { event: 'COMPONENT_SCREENSHOT', data: { image: request.data.image } });
       console.log(2)
 
-      getComponentHtml({ image: request.data.image, html: request.data.html }).then(hmtl => {
-        console.log('GENERATED HTML', hmtl)
-        chrome.tabs.sendMessage(tabId, { event: 'COMPONENT_HTML', data: { hmtl } });
+      getComponentHtml({ image: request.data.image, html: request.data.html }).then(html => {
+        console.log('GENERATED HTML', html)
+        chrome.tabs.sendMessage(tabId, { event: 'COMPONENT_HTML', data: { html } });
       })
     });
 
@@ -81,7 +81,7 @@ async function getComponentHtml({ image, html }) {
                         - The responsiveness must match.
                         - Think about using grid or flex the precisely replicate the visual structure of the web component.
                     - 3. Adjustments
-                      - Use the src "/default.png" in every img tag you generate.
+                      - Use the src "./assets/default.png" in every img tag you generate.
                   > Output:
                     - It is important you only return the HTML in the response.
                     - Don’t provide any more information other than the generated HTML.

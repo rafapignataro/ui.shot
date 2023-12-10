@@ -2,21 +2,25 @@
 const SELECTABLE_TAGS = ['DIV', 'SECTION', 'MAIN', 'HEADER', 'NAV', 'FOOTER'];
 const DEVICE_PIXEL_RATIO = window.devicePixelRatio || 1;
 
-chrome.runtime.onMessage.addListener((request) => {
-  if (request.event === 'OPEN_APP') {
-    init();
-    return;
-  }
-
-  if (request.event === 'SCREENSHOT') {
-    cropScreenshot(request.data);
-    return;
-  }
-});
-
+// LETS
 let hoverElement = null;
 let selectedElement = null;
 let selectedElementCoords = null;
+
+chrome.runtime.onMessage.addListener((request) => {
+  if (!request.event) return;
+
+  switch (request.event) {
+    case 'START_APP':
+      init();
+      break;
+    case 'TAB_SCREENSHOT':
+      handleScreenshotEvent(request.data);
+      break;
+    default:
+      break;
+  }
+});
 
 function init() {
   const menu = document.createElement('div');
@@ -43,7 +47,7 @@ function init() {
   confirmButton.addEventListener('click', async () => {
     if (!selectedElement || !selectedElementCoords) return;
 
-    chrome.runtime.sendMessage({ event: 'COMPONENT_SELECTED' });
+    chrome.runtime.sendMessage({ event: 'REQUEST_SCREENSHOT' });
   })
 
   menu.appendChild(cancelButton);
@@ -67,6 +71,7 @@ function init() {
   document.addEventListener('click', handleMouseClick);
 }
 
+// Browser Events
 function handleMouseOver(event) {
   const { target } = event;
 
@@ -130,42 +135,24 @@ function handleMouseClick(event) {
   console.log('selectedElementCoords', selectedElementCoords)
 }
 
-function cropScreenshot({ screenshotUrl }) {
-  console.log({
-    selectedElement,
-    selectedElementCoords
-  })
+// Service Work Events
+async function handleScreenshotEvent({ screenshotUrl }) {
+  console.log({ selectedElement, selectedElementCoords });
+
   if (!selectedElement || !selectedElementCoords) return;
 
   const { x, y, width, height } = selectedElementCoords;
   console.log('crop area', selectedElementCoords)
 
-  const img = new Image();
-  img.src = screenshotUrl;
+  const croppedImage = await cropImage(screenshotUrl, { x, y, width, height });
 
-  img.onload = function () {
-    const canvas = document.createElement('canvas');
-    canvas.width = width * DEVICE_PIXEL_RATIO;
-    canvas.height = height * DEVICE_PIXEL_RATIO;
-
-    const ctx = canvas.getContext('2d');
-
-    ctx.drawImage(
-      img,
-      x * DEVICE_PIXEL_RATIO,
-      y * DEVICE_PIXEL_RATIO,
-      canvas.width,
-      canvas.height,
-      0,
-      0,
-      canvas.width,
-      canvas.height
-    );
-
-    const croppedImage = canvas.toDataURL('image/png');
-
-    chrome.runtime.sendMessage({ event: 'COMPONENT_SCREENSHOT', data: { image: croppedImage, html: selectedElement.innerHTML } });
-  };
+  chrome.runtime.sendMessage({
+    event: 'CROP_IMAGE',
+    data: {
+      image: croppedImage,
+      html: selectedElement.innerHTML
+    }
+  });
 }
 
 // HELPERS
@@ -184,4 +171,39 @@ function downloadImage(url) {
   downloadLink.href = url;
   downloadLink.download = `qc_${new Date().getTime(0)}`;
   downloadLink.click();
+}
+
+async function cropImage(image, { x, y, width, height }) {
+  return new Promise((resolve, reject) => {
+    try {
+      const img = new Image();
+      img.src = image;
+
+      img.onload = function () {
+        const canvas = document.createElement('canvas');
+        canvas.width = width * DEVICE_PIXEL_RATIO;
+        canvas.height = height * DEVICE_PIXEL_RATIO;
+
+        const ctx = canvas.getContext('2d');
+
+        ctx.drawImage(
+          img,
+          x * DEVICE_PIXEL_RATIO,
+          y * DEVICE_PIXEL_RATIO,
+          canvas.width,
+          canvas.height,
+          0,
+          0,
+          canvas.width,
+          canvas.height
+        );
+
+        const croppedImage = canvas.toDataURL('image/png');
+
+        resolve(croppedImage);
+      }
+    } catch (err) {
+      reject(err);
+    }
+  });
 }

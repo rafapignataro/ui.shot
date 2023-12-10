@@ -4,7 +4,7 @@ function setScreenshotUrl(url) {
 
 chrome.runtime.onMessage.addListener(function (request) {
   console.log(request)
-  if (request.event === 'RENDER_SCREENSHOT') {
+  if (request.event === 'COMPONENT_SCREENSHOT') {
     setScreenshotUrl(request.data.image);
   }
 
@@ -15,7 +15,7 @@ chrome.runtime.onMessage.addListener(function (request) {
 
     const component = document.getElementById('qc_component_html')
 
-    if (!hmtl) {
+    if (!html) {
       component.innerHTML = `
         <span>Something went wrong building the component</span>
       `
