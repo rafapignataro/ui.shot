@@ -42,7 +42,7 @@ async function getComponentHtml({ image, html }) {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        Authorization: 'Bearer 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',
+        Authorization: 'Bearer #{TOKEN}#',
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
