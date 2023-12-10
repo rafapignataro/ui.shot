@@ -2,24 +2,23 @@
   "manifest_version": 3,
   "name": "UI.SHOT",
   "version": "1.0",
-  "description": "Get tailwind HTML by a component shot",
+  "description": "Get the HTML with TailwindCSS of a web component",
   "background": {
     "service_worker": "service-worker.js"
   },
   "action": {
-    "default_title": "Take a screen shot!",
     "default_icon": {
-      "16": "assets/icon.png",
-      "32": "assets/icon.png",
-      "48": "assets/icon.png",
-      "128": "assets/icon.png"
+      "16": "assets/ui_shot.png",
+      "32": "assets/ui_shot.png",
+      "48": "assets/ui_shot.png",
+      "128": "assets/ui_shot.png"
     }
   },
   "icons": {
-    "16": "assets/icon.png",
-    "32": "assets/icon.png",
-    "48": "assets/icon.png",
-    "128": "assets/icon.png"
+    "16": "assets/ui_shot.png",
+    "32": "assets/ui_shot.png",
+    "48": "assets/ui_shot.png",
+    "128": "assets/ui_shot.png"
   },
   "permissions": [
     "activeTab"
